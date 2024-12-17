@@ -13,14 +13,16 @@ QDRANT_API_KEY = os.getenv('QDRANT_API_KEY')
 QDRANT_URL = os.getenv('QDRANT_URL')
 COLLECTION_NAME = "prison_visitor_assistant"
 
-# URLs
-GOV_UK_BASE_URL = os.getenv('GOV_UK_BASE_URL', 'https://www.gov.uk/government/publications/management-of-security-at-visits-policy-framework-closed-estate')
-GOV_UK_ID_URL = os.getenv('GOV_UK_ID_URL', 'https://www.gov.uk/government/publications/management-of-security-at-visits-policy-framework-open-estate/acceptable-forms-of-identification-id-when-visiting-a-prison-in-england-and-wales-annex-a')
-GOV_UK_DRESS_CODE_URL = os.getenv('GOV_UK_DRESS_CODE_URL', 'https://www.gov.uk/government/publications/management-of-security-at-visits-policy-framework-closed-estate/dress-code-for-visitors-annex-h')
-
 # Model Configuration
 COHERE_EMBEDDING_MODEL = "embed-english-v3.0"
 COHERE_CHAT_MODEL = "command-r7b-12-2024"
+
+# Document Paths
+PDF_PATHS = {
+    'dress_code': 'data/Dresscode.pdf',
+    'id': 'data/ID.pdf',
+    'policy': 'data/policy.pdf'
+}
 
 # Validation
 def validate_config():
@@ -36,6 +38,11 @@ def validate_config():
     
     if missing_vars:
         raise ValueError(f"Missing required environment variables: {', '.join(missing_vars)}")
+
+    # Validate PDF paths exist
+    for name, path in PDF_PATHS.items():
+        if not os.path.exists(path):
+            raise ValueError(f"PDF file not found: {path}")
 
 # Validate configuration on import
 validate_config()

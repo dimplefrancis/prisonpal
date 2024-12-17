@@ -27,10 +27,26 @@ Navigating prison visit requirements can be challenging. This tool aims to:
 
 ## 🚀 Getting Started
 
-### API Requirements
+### Prerequisites
 You'll need:
 1. Cohere API key for AI functionality
 2. Qdrant cloud credentials for vector storage
+
+### Environment Configuration
+1. Create a `.env` file in the project root with your API credentials:
+```plaintext
+# API Keys
+COHERE_API_KEY=your_cohere_api_key
+QDRANT_API_KEY=your_qdrant_api_key
+
+# Qdrant Configuration
+QDRANT_URL=your_qdrant_url
+
+# Base URLs (pre-configured)
+GOV_UK_BASE_URL=https://www.gov.uk/government/publications/management-of-security-at-visits-policy-framework-closed-estate
+GOV_UK_ID_URL=https://www.gov.uk/government/publications/management-of-security-at-visits-policy-framework-open-estate/acceptable-forms-of-identification-id-when-visiting-a-prison-in-england-and-wales-annex-a
+GOV_UK_DRESS_CODE_URL=https://www.gov.uk/government/publications/management-of-security-at-visits-policy-framework-closed-estate/dress-code-for-visitors-annex-h
+```
 
 ### Environment Setup
 
@@ -53,6 +69,8 @@ After configuring your `.env` file:
 streamlit run app.py
 ```
 
+The application will automatically load and process the prison policy document on startup.
+
 ## 💻 Development
 
 ### Project Structure
@@ -63,14 +81,15 @@ prison_visitor_assistant/
 │   ├── config.py      # Configuration management
 │   ├── rag_engine.py  # Core RAG functionality
 │   └── web_search.py  # Gov.uk integration
-└── setup/
-    ├── requirements.txt
-    └── .env.template
+├── data/
+│   └── policy.pdf     # Prison policy document
+├── .env               # Environment configuration
+└── requirements.txt   # Python dependencies
 ```
 
 ### Core Features
 1. **Document Processing**
-   - PDF policy document ingestion
+   - Automatic policy document ingestion
    - Intelligent text chunking
    - Vector embedding storage
 
@@ -82,14 +101,13 @@ prison_visitor_assistant/
 
 3. **User Interface**
    - Intuitive chat interface
-   - Document upload capability
    - Source attribution
    - Example questions
+   - Chat history management
 
 ## 🤝 Support and Contribution
 
 ### Getting Help
-- Check the [Quick Start Guide](QUICK_START.md)
 - Visit [Official Prison Visit Information](https://www.gov.uk/prison-visits)
 - Raise an issue in the GitHub repository
 
@@ -103,9 +121,10 @@ We welcome contributions! Areas where you can help:
 ## 📖 Documentation
 
 ### Configuration
-- API keys setup in `.env` file
-- Environmental variable management
-- Document processing settings
+The application uses environment variables for configuration:
+- Required API keys and URLs are set in `.env`
+- Configuration is validated on startup
+- Error messages guide you if any required variables are missing
 
 ### Usage Examples
 Common queries the assistant can help with:

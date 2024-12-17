@@ -10,8 +10,8 @@ from qdrant_client.models import Distance, VectorParams
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_retrieval_chain
 from langchain import hub
+from langchain.prompts import PromptTemplate
 from . import config
-from .web_search import GovUKSearcher
 
 class RAGEngine:
     """RAG Engine for prison visitor assistance."""
@@ -37,7 +37,10 @@ class RAGEngine:
         )
         
         self.vectorstore = None
-        self.web_searcher = GovUKSearcher()
+        self.init_vectorstore()
+        
+        # Load all configured PDFs
+        self.load_all_documents()
         
     def init_vectorstore(self) -> None:
         """Initialize or connect to the vector store."""
@@ -80,6 +83,20 @@ class RAGEngine:
         
         return text_splitter.split_documents(documents)
 
+    def load_all_documents(self) -> None:
+        """Load all configured PDF documents into the vector store."""
+        # Clear existing documents
+        self.clear_vectorstore()
+        self.init_vectorstore()
+        
+        # Process and add each document
+        for doc_type, path in config.PDF_PATHS.items():
+            try:
+                documents = self.process_document(path)
+                self.add_documents(documents)
+            except Exception as e:
+                print(f"Error loading {doc_type} document: {str(e)}")
+
     def add_documents(self, documents: List[dict]) -> None:
         """
         Add documents to the vector store.
@@ -94,7 +111,7 @@ class RAGEngine:
 
     def process_query(self, query: str) -> Tuple[str, List]:
         """
-        Process a user query using RAG with fallback to web search.
+        Process a user query using RAG.
         
         Args:
             query: User's question
@@ -110,46 +127,79 @@ class RAGEngine:
             search_type="similarity_score_threshold",
             search_kwargs={
                 "k": 5,
-                "score_threshold": 0.7
+                "score_threshold": 0.6
             }
         )
 
         # Get relevant documents
         relevant_docs = retriever.get_relevant_documents(query)
 
-        # If relevant documents found, use RAG
         if relevant_docs:
-            retrieval_qa_prompt = hub.pull("langchain-ai/retrieval-qa-chat")
+            # Determine the type of query
+            query_type = 'general'
+            if 'dress' in query.lower() or 'wear' in query.lower():
+                query_type = 'dress_code'
+            elif 'id' in query.lower() or 'identification' in query.lower():
+                query_type = 'id'
+
+            # Create a specific prompt based on query type
+            if query_type == 'dress_code':
+                prompt = PromptTemplate.from_template(
+                    """Based on the prison visitor dress code documents, provide a clear and specific answer about what visitors can and cannot wear.
+
+                    Focus on:
+                    1. List all items of clothing that are not allowed
+                    2. Mention any exceptions (like religious clothing)
+                    3. State what happens if someone doesn't follow the dress code
+
+                    Only include information that is explicitly stated in the documents.
+
+                    Documents:
+                    {context}
+
+                    Question: {input}
+                    Answer:"""
+                )
+            elif query_type == 'id':
+                prompt = PromptTemplate.from_template(
+                    """Based on the prison visitor ID requirement documents, provide a clear and specific answer about identification requirements.
+
+                    Focus on:
+                    1. List all acceptable forms of ID
+                    2. Mention any exceptions (like for children under 16)
+                    3. Explain what happens if someone doesn't have proper ID
+
+                    Only include information that is explicitly stated in the documents.
+
+                    Documents:
+                    {context}
+
+                    Question: {input}
+                    Answer:"""
+                )
+            else:
+                prompt = PromptTemplate.from_template(
+                    """Based on the following documents, provide a clear and specific answer to the question.
+
+                    Only include information that is explicitly stated in the documents.
+
+                    Documents:
+                    {context}
+
+                    Question: {input}
+                    Answer:"""
+                )
+
+            # Create and run the chain
             combine_docs_chain = create_stuff_documents_chain(
-                self.chat_model, 
-                retrieval_qa_prompt
+                self.chat_model,
+                prompt
             )
             retrieval_chain = create_retrieval_chain(retriever, combine_docs_chain)
             response = retrieval_chain.invoke({"input": query})
             return response['answer'], relevant_docs
 
-        # If no relevant documents, try web search fallback
-        if "id" in query.lower():
-            content = self.web_searcher.get_id_requirements()
-        elif "dress" in query.lower() or "wear" in query.lower():
-            content = self.web_searcher.get_dress_code()
-        else:
-            content = None
-
-        if content:
-            # Use chat model to formulate response from web content
-            prompt = f"""Based on the following information from gov.uk, answer the user's question: {query}
-
-            Information:
-            {content}
-
-            Please provide a clear and concise answer focused specifically on what was asked."""
-            
-            response = self.chat_model.invoke(prompt).content
-            return response, []
-
-        # If all else fails, provide a generic response
-        return "I apologize, but I couldn't find specific information to answer your question. Please contact the prison directly or visit gov.uk for more information.", []
+        return "I apologize, but I couldn't find specific information to answer your question in the available documents. Please contact the prison directly for more information.", []
 
     def clear_vectorstore(self) -> None:
         """Clear all documents from the vector store."""

@@ -1,11 +1,6 @@
 # Environment variables
 .env
 
-# Virtual Environment
-venv/
-env/
-ENV/
-
 # Python
 __pycache__/
 *.py[cod]
@@ -28,56 +23,22 @@ wheels/
 .installed.cfg
 *.egg
 
-# Editors and IDEs
+# Virtual Environment
+venv/
+ENV/
+env/
+
+# IDE
 .idea/
 .vscode/
 *.swp
 *.swo
-.project
-.pydevproject
-.settings/
-*.sublime-workspace
-*.sublime-project
 
-# Streamlit
-.streamlit/
-
-# Operating System
+# OS
 .DS_Store
 Thumbs.db
-*.bak
-*.tmp
-.directory
 
-# Logs and databases
+# Application specific
 *.log
-*.sqlite
-*.db
-
-# Test coverage
-.coverage
-htmlcov/
-.tox/
-.nox/
-.coverage.*
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-*.ipynb
-
-# Local development
-local_settings.py
-*.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Cache directories
-.cache/
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
+temp/
+data/*.pdf
