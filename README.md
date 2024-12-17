@@ -38,7 +38,7 @@ You'll need:
 ### Installation Steps
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/prisonpal.git
+git clone https://github.com/dimplefrancis/prisonpal.git
 cd prisonpal
 ```
 
