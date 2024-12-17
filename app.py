@@ -36,7 +36,40 @@ def initialize_system():
 
 def main():
     """Main application function."""
-    st.title("**PrisonPal** 🏢")
+    # Add custom CSS for styling
+    st.markdown("""
+    <style>
+    .main-logo {
+        margin-bottom: 2rem;
+    }
+    .sidebar-image {
+        width: 100%;
+        margin-bottom: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .stButton button {
+        width: 100%;
+        border-radius: 20px;
+        background-color: #2E4053;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        transition: all 0.3s ease;
+        margin-top: 10px;
+    }
+    .stButton button:hover {
+        background-color: #34495E;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    # Display logo in main area with reduced size
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.image("images/Logo.png", use_container_width=True)
     
     # Initialize session state
     init_session_state()
@@ -82,9 +115,15 @@ def main():
                 st.error(f"Error: {str(e)}")
                 st.info("Please try asking your question again.")
     
-    # Sidebar controls
+    # Sidebar with logo and waiting image
     with st.sidebar:
-        st.divider()
+        # Display logo in sidebar
+        st.image("images/Logo.png", use_container_width=True)
+        
+        # Display the waiting image without caption
+        st.image("images/Waiting.jpeg", use_container_width=True)
+        
+        # Clear Chat History button right under the waiting image
         if st.button('Clear Chat History'):
             st.session_state.chat_history = []
             st.rerun()

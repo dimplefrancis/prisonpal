@@ -1,10 +1,12 @@
-# Prison Visitor Assistant Tool
+# PrisonPal
+
+![PrisonPal Interface](images/StreamlitApp.png)
 
 ## Overview
 An intelligent assistant that streamlines access to prison visiting information in England and Wales. Built with advanced AI technology, this tool helps visitors understand requirements, policies, and procedures by providing accurate, sourced information from official documents.
 
 ## 🎯 Purpose
-Navigating prison visit requirements can be challenging. This tool aims to:
+Navigating prison visit requirements can be challenging. PrisonPal aims to:
 - Provide instant, accurate answers to visitor questions
 - Reduce uncertainty about visit requirements
 - Ensure visitors have the correct documentation
@@ -29,8 +31,32 @@ Navigating prison visit requirements can be challenging. This tool aims to:
 
 ### Prerequisites
 You'll need:
-1. Cohere API key for AI functionality
-2. Qdrant cloud credentials for vector storage
+1. Python 3.8 or higher
+2. Cohere API key for AI functionality
+3. Qdrant cloud credentials for vector storage
+
+### Installation Steps
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/prisonpal.git
+cd prisonpal
+```
+
+2. Create and activate a virtual environment:
+```bash
+# On Unix/MacOS
+python -m venv venv
+source venv/bin/activate
+
+# On Windows
+python -m venv venv
+venv\Scripts\activate
+```
+
+3. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
 
 ### Environment Configuration
 1. Create a `.env` file in the project root with your API credentials:
@@ -48,19 +74,12 @@ GOV_UK_ID_URL=https://www.gov.uk/government/publications/management-of-security-
 GOV_UK_DRESS_CODE_URL=https://www.gov.uk/government/publications/management-of-security-at-visits-policy-framework-closed-estate/dress-code-for-visitors-annex-h
 ```
 
-### Environment Setup
-
-**Unix/MacOS**
+### Quick Setup (Alternative)
+For Unix/MacOS users, you can use the provided setup script:
 ```bash
 chmod +x setup.sh
 ./setup.sh
 source venv/bin/activate
-```
-
-**Windows**
-```cmd
-setup.bat
-venv\Scripts\activate
 ```
 
 ### Launch Application
@@ -75,14 +94,14 @@ The application will automatically load and process the prison policy document o
 
 ### Project Structure
 ```
-prison_visitor_assistant/
+prisonpal/
 ├── app.py              # Main application
 ├── src/
 │   ├── config.py      # Configuration management
 │   ├── rag_engine.py  # Core RAG functionality
 │   └── web_search.py  # Gov.uk integration
-├── data/
-│   └── policy.pdf     # Prison policy document
+├── data/              # Data directory
+├── images/            # Application images
 ├── .env               # Environment configuration
 └── requirements.txt   # Python dependencies
 ```
